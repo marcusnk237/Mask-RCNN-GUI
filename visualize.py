@@ -18,6 +18,7 @@ def random_colors(N):
     np.random.seed(1)
     return [tuple(255 * np.random.rand(3)) for _ in range(N)]
 
+# Définition de la fonction score
 def score_to_color(score):
     h = (120 * score) / 360.0
     s = 1
@@ -27,6 +28,7 @@ def score_to_color(score):
 def float_tuple_to_int(t):
     return tuple(int(n) for n in t) + (255,)
 
+# Définition de la fonction Masque
 def apply_mask(image, mask, color, alpha=0.5):
     """apply mask to image"""
     for n, c in enumerate(color):
@@ -62,20 +64,17 @@ def draw_line(image, point1, point2, color, thickness=1, style='dotted', gap=20)
                 cv2.line(image, s, e, color, thickness)
             i = i + 1
 
-
+# Fonction polygône
 def draw_polygon(img, points, color, thickness=1, style='dotted', gap=20):
-    # Goes through each corner and joins them up
     current = points[0]
     points.append(points.pop(0))
-    # points = np.concatenate(points, points.pop(0))
     for p in points:
         destination = current
         current = p
         draw_line(img, current, destination, color, thickness, style, gap)
 
-
+# Fonction rectangle (Qui sera utilisée pour délimiter les cibles)
 def draw_rectangle(img, point1, point2, color, thickness=1, style='dotted', gap=20):
-    # Takes the two boundary points and converts them to their 4 corners
     points = [point1, (point2[0], point1[1]), point2, (point1[0], point2[1])]
     draw_polygon(img, points, color, thickness, style, gap)
 
@@ -85,6 +84,7 @@ def draw_pil_rectangle(draw, point1, point2, color, width=1):
         end = (point2[0] + i, point2[1] + i)
         draw.rectangle((start, end), outline=color)
 
+# Affichage du texte
 def draw_text(draw, caption, point, color):
     x = point[0]
     y = point[1]
@@ -98,7 +98,6 @@ def draw_text(draw, caption, point, color):
 
     color = float_tuple_to_int(color)
 
-    # Add the outline
     for i in range(2):
         direction = (-1) ** i
         draw.text((x + direction, y - 16), caption, font=font, fill=(0, 0, 0))
@@ -107,9 +106,7 @@ def draw_text(draw, caption, point, color):
     draw.text((x, y - 16), caption, font=font, fill=color)
 
 def display_instances(image, boxes, masks, ids, names, scores, showMasks, showBoxes):
-    """
-        take the image and results and apply the mask, box, and Label
-    """
+    
     n_instances = boxes.shape[0]
     colors = random_colors(n_instances)
 
@@ -125,17 +122,17 @@ def display_instances(image, boxes, masks, ids, names, scores, showMasks, showBo
         score = scores[i] if scores is not None else None
         caption = '{} {:.1f}%'.format(label, score * 100) if score else label
 
-        color = name_to_color(label) # score_to_color(score)
+        color = name_to_color(label) 
 
         img_pil = Image.fromarray(image)
         draw = ImageDraw.Draw(img_pil)
         draw_text(draw, caption, (x1, y1), color)
 
         if showBoxes:
-            # Use PIL to draw the rectangle
+            # On utilise PIL pour dessiner les rectangles
             draw_pil_rectangle(draw, (x1, y1), (x2, y2), float_tuple_to_int(color), 2)
 
-            # Use CV2 to draw the rectangle
+            # On utilise openCV pour dessiner les rectangles
             # draw_rectangle(image, (x1, y1), (x2, y2), color, 1, 'dashed', 6)
 
         image = np.array(img_pil)
@@ -151,11 +148,6 @@ def display_instances(image, boxes, masks, ids, names, scores, showMasks, showBo
                 # Subtract the padding and flip (y, x) to (x, y)
                 verts = np.fliplr(verts) - 1
                 cv2.polylines(image, np.int32([verts]), False, color, thickness=1, lineType=cv2.LINE_AA)
-
-        # Draw text using CV2
-        # image = cv2.putText(
-        #     image, caption, (x1, y1), cv2.FONT_HERSHEY_PLAIN, 0.7, color, 1,
-        # )
     return image
 
 # w, h = verts.shape
