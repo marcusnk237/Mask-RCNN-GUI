@@ -13,9 +13,6 @@ Il est essentiel de créer un dossier nommé "weights", qui contiendra le modèl
 Le modèle COCO peut être télécharger à partir de cette adresse: https://github.com/matterport/Mask_RCNN/releases
 ( puis télécharger mask_rcnn_coco.h5)
 
-Dependances:
-cv2, pyqt5, numpy, scipy, cython, h5py, Pillow, scikit-image, tensorflow-gpu, keras, pycocotools
-
 Installation de pycocotools:
 
 git clone https://github.com/philferriere/cocoapi.git
