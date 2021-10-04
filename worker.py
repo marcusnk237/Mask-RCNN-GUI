@@ -9,7 +9,7 @@ from enum import Enum
 from lib import model as modellib
 from lib import coco
 
-# Noms de classes du modèle COCO
+# COCO model classes
 class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'bus', 'train', 'truck', 'boat', 'traffic light',
                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
@@ -27,24 +27,22 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'teddy bear', 'hair drier', 'toothbrush']
 
 class InferenceConfig(coco.CocoConfig):
-    # La taille du batch est à 1 étant donnée qu'on veut faire de la détection et du suivi à chaque image. Batch size = GPU_COUNT * IMAGES_PER_GPU
+    # Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
 config = InferenceConfig()
 config.print()
 
-# Dossier d'origine de notre projet
+# Root directory
 ROOT_DIR = os.getcwd()
 
-# Dossier de sauvegarde de nos fichiers logs
+# Log save directory
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
-# Dossier contenant les poids du modèle COCO
+# COCO model directory
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "weights/mask_rcnn_coco.h5")
 
-# Dossier contenant des images pouvant être utilisées pour de la détection. Nous n'utiliserons pas ce dossier
-#IMAGE_DIR = os.path.join(ROOT_DIR, "images")
 
 class Worker(QThread):
     communicator = pyqtSignal(Enum)
@@ -118,19 +116,19 @@ class Worker(QThread):
 
         self.communicator.emit(Actions.LOADED_WEIGHTS)
 
-        # Tant que la vidéo est en lecture
+        # While the video is playing
         while True:
             #
             if self.stopped:
                 continue
 
-            # Chargement de la vidéo
+            # Loading video
             self.capture = cv2.VideoCapture(self.filePath)
 
-            # L'application signale que la vidéo a été chargée
+            # We send a signal to the GUI to alerting that the video was successfully loaded
             self.communicator.emit(Actions.LOADED_VIDEO)
 
-            # Création de notre objet à partir des propriétés de la vidéo
+            # Creation of the output
             if self.saveVideo:
                 width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
                 height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -144,7 +142,7 @@ class Worker(QThread):
                 if frame is None:
                     self.stopped = True
                     break
-                # Détection
+                # Detection
                 if self.detectObjects:
                     results = model.detect([frame], verbose=0)
                     r = results[0]
