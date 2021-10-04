@@ -10,10 +10,10 @@ from PyQt5.QtCore import pyqtSignal, Qt
 def trap_exc_during_debug(*args):
     print(args)
 
-# Affichage de l'erreur sans faire crasher le GUI
+# Display error without crashing the GUI
 sys.excepthook = trap_exc_during_debug
 
-# Séparateur Horizontal
+#  Horizontal Separator
 class QHLine(QFrame):
     def __init__(self):
         super(QHLine, self).__init__()
@@ -29,58 +29,58 @@ class Window(QWidget):
 
         self.thread = Worker(self)
 
-        # Bouton Start/Pause
+        # Start/Pause Button
         self.controller.connect(self.thread.handleRequest)
 
         # Connect action reporter
         self.thread.communicator.connect(self.action)
 
-        # Callback pour le changement de frame
+        # Callback for frame change
         self.thread.frameChanged.connect(self.frameChanged)
 
         grid = QGridLayout()
         grid.setSpacing(5)
 
-        # Affichage de l'etat actuel
-        self.statusLabel = QLabel('Status: Choississez une vidéo')
+        # Display the current status
+        self.statusLabel = QLabel('Status: Loading a video')
         grid.addWidget(self.statusLabel, 0, 0, 1, 8)
 
-        # Affichage des FPS
+        # Display FPS
         self.fpsLabel = QLabel('')
         self.fpsLabel.setAlignment(Qt.AlignRight)
         grid.addWidget(self.fpsLabel, 0, 8, 1, 4)
 
-        # Séparateur horizontal
+        # Horizontal separator
         grid.addWidget(QHLine(), 1, 0, 1, 12)
 
-        # Fonction permettant d'ouvrir le fichier vidéo
-        self.chooseVideoButton = QPushButton('Choississez la vidéo')
+        # Open video file
+        self.chooseVideoButton = QPushButton('Loading video')
         self.chooseVideoButton.clicked.connect(self.chooseVideo)
         self.chooseVideoButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         grid.addWidget(self.chooseVideoButton, 2, 0, 1, 12)
 
-        # Chargement des poids du modèle et ouverture de la vidéo
-        self.startButton = QPushButton('Démarrer')
+        # Loading model and start video
+        self.startButton = QPushButton('Start')
         self.startButton.clicked.connect(self.start)
         self.startButton.setEnabled(False)
         self.startButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         grid.addWidget(self.startButton, 3, 0, 2, 4)
 
-        # Pause de la lecture
+        # Pause
         self.pauseButton = QPushButton('Pause')
         self.pauseButton.clicked.connect(self.pause)
         self.pauseButton.setEnabled(False)
         self.pauseButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         grid.addWidget(self.pauseButton, 3, 4, 1, 4)
 
-        # Reprise de la lecture
-        self.resumeButton = QPushButton('Reprendre')
+        # Resume video 
+        self.resumeButton = QPushButton('Resume')
         self.resumeButton.clicked.connect(self.resume)
         self.resumeButton.setEnabled(False)
         self.resumeButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         grid.addWidget(self.resumeButton, 4, 4, 1, 4)
 
-        # Arrêt de la lecture et fermeture de la vidéo
+        # Stop video and close the windows
         self.stopButton = QPushButton('Stop')
         self.stopButton.clicked.connect(self.stop)
         self.stopButton.setEnabled(False)
@@ -92,11 +92,11 @@ class Window(QWidget):
         self.filePathLabel.setWordWrap(True)
         grid.addWidget(self.filePathLabel, 5, 0, 1, 12)
 
-        # Affichage de la durée actuelle de la vidéo 
+        # Display current video duration
         self.currentTimeLabel = QLabel('0:00:00')
         grid.addWidget(self.currentTimeLabel, 6, 0, 1, 1)
 
-        # Choix du temps de lecture
+        # Set video time
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setFocusPolicy(Qt.StrongFocus)
         self.slider.setTickPosition(QSlider.NoTicks)
@@ -106,61 +106,62 @@ class Window(QWidget):
         self.slider.setEnabled(False)
         grid.addWidget(self.slider, 6, 1, 1, 10)
 
-        # Affichage de la durée totale de la vidéo
+        # Display total video duration
         self.finalTimeLabel = QLabel('0:00:00')
         grid.addWidget(self.finalTimeLabel, 6, 11, 1, 1)
 
-        # Séparateur horizontal
+        # Horizontal separator
         grid.addWidget(QHLine(), 7, 0, 1, 12)
 
-        # Démarrer la détection de cibles
-        self.detectToggle = QCheckBox('Détecter les cibles')
+        # Target detector
+        self.detectToggle = QCheckBox('Detect target')
         self.detectToggle.setEnabled(False)
         self.detectToggle.stateChanged.connect(self.toggleDetection)
         grid.addWidget(self.detectToggle, 8, 0, 1, 12)
 
-        # Afficher les masques de détection
-        self.masksToggle = QCheckBox('Afficher les masques')
+        # Display boundaries boxes
+        self.masksToggle = QCheckBox('Display boundaries boxes')
         self.masksToggle.setEnabled(False)
         self.masksToggle.stateChanged.connect(self.toggleMasks)
         self.masksToggle.setChecked(True)
         grid.addWidget(self.masksToggle, 9, 0, 1, 6)
 
-        # Afficher les cibles détectées
-        self.boxesToggle = QCheckBox('Afficher les cibles détectées')
+        # Display detected targets
+        self.boxesToggle = QCheckBox('Display detected targets')
         self.boxesToggle.setEnabled(False)
         self.boxesToggle.stateChanged.connect(self.toggleBoxes)
         self.boxesToggle.setChecked(True)
         grid.addWidget(self.boxesToggle, 9, 6, 1, 6)
 
-        # Séparateur horizontal
+        # Horizontal separator
         grid.addWidget(QHLine(), 10, 0, 1, 12)
 
-        # Sauvegarder le résultat de la détection
-        self.saveToggle = QCheckBox('Enregistrer la vidéo')
+        # Save detection result
+        self.saveToggle = QCheckBox('Save video')
         self.saveToggle.setEnabled(False)
         self.saveToggle.stateChanged.connect(self.toggleSave)
         self.saveToggle.setChecked(False)
         grid.addWidget(self.saveToggle, 11, 0, 1, 12)
 
-        # Chemin de la sauvegarde
-        self.savePathLabel = QLabel('Sauvegarde : ')
+        # Save path
+        self.savePathLabel = QLabel('Save : ')
         self.savePathLabel.setWordWrap(True)
         grid.addWidget(self.savePathLabel, 12, 0, 1, 12)
 
         self.setLayout(grid)
 
-    #Définition de la fonction de sauvegarde
+    # Save function
     def toggleSave(self):
         if self.saveToggle.isChecked():
             self.controller.emit(Requests.SAVE_ON)
         else:
             self.controller.emit(Requests.SAVE_OFF)
             return
-        filePath = QFileDialog.getExistingDirectory(self, "Choississez la déstination de sauvegarde...")
+        filePath = QFileDialog.getExistingDirectory(self, "Set save path...")
         self.savePathLabel.setText('sauvegarde : ' + filePath)
         self.thread.setSave(filePath)
-    # Définition de la fonction permettant le choix du temps de lecture
+    
+    # Video time setting function
     def setTime(self):
         seconds = self.slider.value()
         paused = self.thread.paused
@@ -168,13 +169,13 @@ class Window(QWidget):
         time.sleep(0.1)
         fps = self.thread.capture.get(cv2.CAP_PROP_FPS)
         new_frame_number = round(seconds * fps)
-        print("Chargement pour le Frame", new_frame_number)
+        print("Frame loading", new_frame_number)
         self.thread.capture.set(cv2.CAP_PROP_POS_FRAMES, new_frame_number)
-        # Reprendre si la vidéo a été mise en pause
+        # Resume video if it was paused
         if not paused:
             self.resume()
     
-    # Fonction liée à la mise à jour de la détection
+    # Update detection function
     def toggleDetection(self): 
         if self.detectToggle.isChecked():
             self.controller.emit(Requests.DETECT_ON)
@@ -183,7 +184,7 @@ class Window(QWidget):
         self.masksToggle.setEnabled(self.detectToggle.isChecked())
         self.boxesToggle.setEnabled(self.detectToggle.isChecked())
 
-    #Fonction liée à la mise à jour des masques
+    # Mask update function
     def toggleMasks(self):
         if self.masksToggle.isChecked():
             self.controller.emit(Requests.MASKS_ON)
@@ -191,7 +192,7 @@ class Window(QWidget):
             self.controller.emit(Requests.MASKS_OFF)
         if not self.masksToggle.isChecked() and not self.boxesToggle.isChecked():
             self.detectToggle.setChecked(False)
-    #Fonction liée à la mise à jour des rectangles contenant les cibles
+    # Bundaries boxes creation function
     def toggleBoxes(self):
         if self.boxesToggle.isChecked():
             self.controller.emit(Requests.BOXES_ON)
@@ -199,29 +200,29 @@ class Window(QWidget):
             self.controller.emit(Requests.BOXES_OFF)
         if not self.masksToggle.isChecked() and not self.boxesToggle.isChecked():
             self.detectToggle.setChecked(False)
-    # Fonction permettant le choix de la vidéo
+    # Loading video function
     def chooseVideo(self):
-        filePath, _ = QFileDialog.getOpenFileName(self, 'Choississez le fichier vidéo', '', 'Fichiers | *.mp4;')
+        filePath, _ = QFileDialog.getOpenFileName(self, 'Loading video', '', 'Fichiers | *.mp4;')
 
         if filePath == '':
-            self.statusLabel.setText('Status: Choississez la vidéo')
+            self.statusLabel.setText('Status: Loading video')
             self.startButton.setEnabled(False)
             return
         self.filePathLabel.setText('File: ' + filePath)
         self.thread.setVideo(filePath)
         if self.thread.loadedWeights:
-            self.statusLabel.setText('Status: Prêt')
+            self.statusLabel.setText('Status: Ready')
         else:
-            self.statusLabel.setText('Status: Chargement des poids du modèle...')
+            self.statusLabel.setText('Status: Loading model...')
 
-        # Chargement des poids du modèle
+        # Loading model
         if not self.thread.isRunning():
             self.thread.start()
         self.saveToggle.setEnabled(True)
         if self.thread.loadedWeights:
             self.startButton.setEnabled(True)
 
-    # Changement des Frames
+    # Loading frame
     def frameChanged(self):
         formatted = round(self.thread.fps * 100) / 100
         self.fpsLabel.setText('FPS: ' + str(formatted))
@@ -237,13 +238,14 @@ class Window(QWidget):
             fps = self.thread.capture.get(cv2.CAP_PROP_FPS)
             total_frames = self.thread.capture.get(cv2.CAP_PROP_FRAME_COUNT)
 
-            # Durée de la vidéo en secondes
+            # Video duration in seconds
             duration = (float(total_frames) / float(fps))
 
             formatted = self.formatTime(duration * 1000)
             self.finalTimeLabel.setText(formatted)
             self.slider.setMaximum(duration)
-    # Format de la durée de la vidéo
+    
+    # Format time function
     def formatTime(self, milliseconds):
         minutes, seconds = divmod(milliseconds / 1000, 60)
         hours, minutes = divmod(minutes, 60)
@@ -251,9 +253,9 @@ class Window(QWidget):
 
     def action(self, action):
         if action is Actions.LOADING_WEIGHTS:
-            self.statusLabel.setText('Status: Chargement des poids du modèle...')
+            self.statusLabel.setText('Status: Loading model...')
         if action is Actions.LOADED_WEIGHTS:
-            self.statusLabel.setText('Status: Prêt')
+            self.statusLabel.setText('Status: Ready')
             self.startButton.setEnabled(True)
             self.pauseButton.setEnabled(False)
             self.resumeButton.setEnabled(False)
@@ -261,7 +263,7 @@ class Window(QWidget):
             self.detectToggle.setEnabled(True)
 
         if action is Actions.LOADED_VIDEO:
-            self.statusLabel.setText('Status: En lecture...')
+            self.statusLabel.setText('Status: Playing...')
             self.startButton.setEnabled(False)
             self.resumeButton.setEnabled(False)
             self.pauseButton.setEnabled(True)
@@ -269,7 +271,7 @@ class Window(QWidget):
             self.slider.setEnabled(True)
 
         if action is Actions.FINISHED:
-            self.statusLabel.setText('Status: Terminé')
+            self.statusLabel.setText('Status: Over')
             self.stop()
 
     def start(self):
@@ -311,7 +313,7 @@ class Window(QWidget):
 
 app = QApplication(sys.argv)
 window = Window()
-window.setWindowTitle('Mask - RCNN')
+window.setWindowTitle('Mask - RCNN GUI')
 window.show()
 
 sys.exit(app.exec_())
