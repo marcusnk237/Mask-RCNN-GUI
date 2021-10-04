@@ -18,7 +18,7 @@ def random_colors(N):
     np.random.seed(1)
     return [tuple(255 * np.random.rand(3)) for _ in range(N)]
 
-# Définition de la fonction score
+# score fucntion
 def score_to_color(score):
     h = (120 * score) / 360.0
     s = 1
@@ -28,7 +28,7 @@ def score_to_color(score):
 def float_tuple_to_int(t):
     return tuple(int(n) for n in t) + (255,)
 
-# Définition de la fonction Masque
+# Mask function
 def apply_mask(image, mask, color, alpha=0.5):
     """apply mask to image"""
     for n, c in enumerate(color):
@@ -64,7 +64,7 @@ def draw_line(image, point1, point2, color, thickness=1, style='dotted', gap=20)
                 cv2.line(image, s, e, color, thickness)
             i = i + 1
 
-# Fonction polygône
+# Draw polygon
 def draw_polygon(img, points, color, thickness=1, style='dotted', gap=20):
     current = points[0]
     points.append(points.pop(0))
@@ -73,7 +73,7 @@ def draw_polygon(img, points, color, thickness=1, style='dotted', gap=20):
         current = p
         draw_line(img, current, destination, color, thickness, style, gap)
 
-# Fonction rectangle (Qui sera utilisée pour délimiter les cibles)
+# Draw rectangle for bundary box
 def draw_rectangle(img, point1, point2, color, thickness=1, style='dotted', gap=20):
     points = [point1, (point2[0], point1[1]), point2, (point1[0], point2[1])]
     draw_polygon(img, points, color, thickness, style, gap)
@@ -84,7 +84,7 @@ def draw_pil_rectangle(draw, point1, point2, color, width=1):
         end = (point2[0] + i, point2[1] + i)
         draw.rectangle((start, end), outline=color)
 
-# Affichage du texte
+# Draw text
 def draw_text(draw, caption, point, color):
     x = point[0]
     y = point[1]
@@ -129,11 +129,8 @@ def display_instances(image, boxes, masks, ids, names, scores, showMasks, showBo
         draw_text(draw, caption, (x1, y1), color)
 
         if showBoxes:
-            # On utilise PIL pour dessiner les rectangles
+            # We use PIL too draw rectangles
             draw_pil_rectangle(draw, (x1, y1), (x2, y2), float_tuple_to_int(color), 2)
-
-            # On utilise openCV pour dessiner les rectangles
-            # draw_rectangle(image, (x1, y1), (x2, y2), color, 1, 'dashed', 6)
 
         image = np.array(img_pil)
 
@@ -150,14 +147,3 @@ def display_instances(image, boxes, masks, ids, names, scores, showMasks, showBo
                 cv2.polylines(image, np.int32([verts]), False, color, thickness=1, lineType=cv2.LINE_AA)
     return image
 
-# w, h = verts.shape
-# for i in range(0, w, 2):
-#     if i + 2 > w:
-#         break
-#
-#     x1 = verts[i][0]
-#     y1 = verts[i][1]
-#     x2 = verts[i + 1][0]
-#     y2 = verts[i + 1][1]
-#     draw.line([(int(x1), int(y1)) , (int(x2), int(y2))], fill=float_tuple_to_int(color), width=2)
-#     cv2.line(image, (int(x1), int(y1)), (int(x2), int(y2)), color, thickness=1, lineType=cv2.LINE_AA)
